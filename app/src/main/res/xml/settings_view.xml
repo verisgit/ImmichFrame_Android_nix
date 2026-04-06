@@ -18,10 +18,6 @@
             android:key="useWebView"
             android:title="Use WebView?" />
         <SwitchPreferenceCompat
-            android:defaultValue="true"
-            android:key="keepScreenOn"
-            android:title="Keep Screen On?" />
-        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="blurredBackground"
             android:title="Blurred Background?" />

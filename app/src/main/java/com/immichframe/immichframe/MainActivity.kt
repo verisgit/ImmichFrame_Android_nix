@@ -66,7 +66,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rcpServer: RpcHttpServer
     private var isWeatherTimerRunning = false
     private var useWebView = true
-    private var keepScreenOn = true
     private var blurredBackground = true
     private var showCurrentDate = true
     private var currentWeather = ""
@@ -495,7 +494,6 @@ class MainActivity : AppCompatActivity() {
         showCurrentDate = prefs.getBoolean("showCurrentDate", true)
         var savedUrl = prefs.getString("webview_url", "") ?: ""
         useWebView = prefs.getBoolean("useWebView", true)
-        keepScreenOn = prefs.getBoolean("keepScreenOn", true)
         val authSecret = prefs.getString("authSecret", "") ?: ""
         val screenDim = prefs.getBoolean("screenDim", false)
         val settingsLock = prefs.getBoolean("settingsLock", false)
@@ -509,11 +507,7 @@ class MainActivity : AppCompatActivity() {
         swipeRefreshLayout.isEnabled = !settingsLock
         txtPhotoInfo.visibility = View.GONE //enabled in onSettingsLoaded based on server settings
         txtDateTime.visibility = View.GONE //enabled in onSettingsLoaded based on server settings
-        if (keepScreenOn) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        } else {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
+
         if (screenDim) {
             handler.post(dimCheckRunnable)
         } else {
@@ -847,13 +841,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (keepScreenOn) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        } else {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
         hideSystemUI()
-
     }
 
     override fun onDestroy() {
