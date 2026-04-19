@@ -48,6 +48,7 @@ import androidx.core.graphics.toColorInt
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import com.immichframe.immichframe.sensors.ActivitySensor
 
 class MainActivity : AppCompatActivity() {
     private lateinit var webView: WebView
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     private var retrofit: Retrofit? = null
     private lateinit var apiService: Helpers.ApiService
     private lateinit var rcpServer: RpcHttpServer
+    private var activitySensor: ActivitySensor? = null
     private var isWeatherTimerRunning = false
     private var useWebView = true
     private var blurredBackground = true
@@ -94,6 +96,13 @@ class MainActivity : AppCompatActivity() {
         override fun run() {
             checkDimTime()
             handler.postDelayed(this, 30000)
+        }
+    }
+    private val sensorServiceRunnable = object : Runnable {
+        override fun run() {
+            handler.removeCallbacks(this)
+            activitySensor?.checkSensors()
+            handler.postDelayed(this, 1000L)
         }
     }
     private var isShowingFirst = true
@@ -497,6 +506,24 @@ class MainActivity : AppCompatActivity() {
         val authSecret = prefs.getString("authSecret", "") ?: ""
         val screenDim = prefs.getBoolean("screenDim", false)
         val settingsLock = prefs.getBoolean("settingsLock", false)
+        val keepScreenOn = prefs.getBoolean("keepScreenOn", true)
+
+        if (keepScreenOn) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+
+        // Motion sensor — teardown old instance before (re)creating
+        activitySensor?.release()
+        activitySensor = null
+        handler.removeCallbacks(sensorServiceRunnable)
+        val motionSensorEnabled = prefs.getBoolean("motionSensorEnabled", false)
+        if (motionSensorEnabled) {
+            val timeoutMinutes = prefs.getString("motionSensorTimeout", "15")?.toIntOrNull() ?: 15
+            activitySensor = ActivitySensor(this, timeoutMinutes)
+            handler.post(sensorServiceRunnable)
+        }
 
         webView.visibility = if (useWebView) View.VISIBLE else View.GONE
         imageView1.visibility = if (useWebView) View.GONE else View.VISIBLE
@@ -847,6 +874,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         rcpServer.stop()
+        activitySensor?.release()
         handler.removeCallbacksAndMessages(null)
     }
 

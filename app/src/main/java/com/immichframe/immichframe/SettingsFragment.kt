@@ -52,6 +52,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
             txtDimTime?.isVisible = value
             true
         }
+        val motionTimeoutPref = findPreference<EditTextPreference>("motionSensorTimeout")
+        motionTimeoutPref?.setOnBindEditTextListener { editText ->
+            editText.inputType = InputType.TYPE_CLASS_NUMBER
+        }
+        motionTimeoutPref?.setOnPreferenceChangeListener { _, newValue ->
+            val minutes = newValue.toString().toIntOrNull()
+            if (minutes != null && minutes > 0) {
+                true
+            } else {
+                Toast.makeText(requireContext(), "Enter a positive number of minutes.", Toast.LENGTH_SHORT).show()
+                false
+            }
+        }
+
         val chkSettingsLock = findPreference<SwitchPreferenceCompat>("settingsLock")
         chkSettingsLock?.setOnPreferenceChangeListener { _, newValue ->
             val enabling = newValue as Boolean

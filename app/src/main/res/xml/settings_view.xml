@@ -26,9 +26,29 @@
             android:key="showCurrentDate"
             android:title="Show Current Date?" />
         <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="keepScreenOn"
+            android:summary="Disable this when using the motion sensor"
+            android:title="Keep Screen On?" />
+        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="settingsLock"
             android:title="Lock access to these settings?" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Motion Sensor (Nixplay)">
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="motionSensorEnabled"
+            android:summary="Sleep screen after inactivity; wake on movement"
+            android:title="Enable Motion Sensor?" />
+        <EditTextPreference
+            android:defaultValue="15"
+            android:dependency="motionSensorEnabled"
+            android:inputType="number"
+            android:key="motionSensorTimeout"
+            android:summary="Minutes of no motion before screen sleeps"
+            android:title="Sleep Timeout (minutes)" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Screen Dimming">
